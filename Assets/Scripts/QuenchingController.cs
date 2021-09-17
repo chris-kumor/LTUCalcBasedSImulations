@@ -80,6 +80,8 @@ public class QuenchingController : MonoBehaviour{
         isQuenching = coll.gameObject.tag == "Metal Bars";
         if(isQuenching)
             mBController = coll.gameObject.GetComponent<MetalBarController>();
+        else
+            isQuenching = false;
         resetTimer();
     }
 }

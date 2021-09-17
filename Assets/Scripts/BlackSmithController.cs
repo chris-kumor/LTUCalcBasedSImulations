@@ -24,6 +24,7 @@ public class BlackSmithController : MonoBehaviour{
     //Rigidbody of obj being held
     private Rigidbody objRB;
     private MetalBarController mBContr;
+    public QuenchingController quenchCont;
     private bool isCarrying;
     private void holdingObject(){
         holdingObj.transform.position = Vector3.Lerp(holdingObj.transform.position,holdingPos.position,Time.time);
@@ -60,6 +61,8 @@ public class BlackSmithController : MonoBehaviour{
             if(Input.GetButtonDown("Interact") && dist <= minDist) {
                 isCarrying = true;
                 mBContr.isHeating = false;
+                if(mBContr.inWater)
+                    quenchCont.isQuenching = false;
                 mBContr.inWater = false;
                 mBContr.inAir = true;
                 mBContr.resetTimer();
@@ -69,14 +72,14 @@ public class BlackSmithController : MonoBehaviour{
             }
         }
         //dropping
-        else if(isCarrying && Input.GetButtonDown("Interact")){
+        else if(isCarrying && Input.GetButtonDown("Interact") && !quenchCont.isQuenching){
             isCarrying = false;
             objRB.constraints = RigidbodyConstraints.None;
             metalInfoContr.Reset();
             mBContr.resetTimer();
             //Since we are not carrying the metal bar anymore we dont want to just simply phase through it or vice versa5
             Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, false);
-            holdingObject();
+            
         }
         //carrying obj
         else if(isCarrying){   

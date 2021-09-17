@@ -1,15 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class MetalBarController : MonoBehaviour
-{
-    private Color[] emissiveColors = {new Color(0.12743768f, 0.0f, 0.0f, 1.00f), new Color(0.1811643f, 0.0f, 0.0f, 1.00f)
-    ,new Color(0.30946895f, 0.0f, 0.0f, 1.00f), new Color(0.4072403f, 0.0f, 0.0f, 1.00f), new Color(0.61720675f, 0.0f, 0.0f, 1.0f),
-    new Color(0.72305536f, 0.0f, 0.0f, 1.00f), new Color(0.8631574f, 0.0f, 0.0f, 1.00f), new Color(1.0f, 0.0f, 0.0f, 1.0f),
-    new Color(1.0f, 0.32314324f, 0.03071345f, 1.0f), new Color(1.0f, 0.5840786f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 0.03071345f, 1.0f),
-    new Color(1.0f, 1.0f, 0.2874409f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f)};
-    private Color desiredColor;
+public class MetalBarController : MonoBehaviour{
+    private Gradient incanGradient;
     public MetalStruct metalBarStruct;
     public Rigidbody metalBarRB;
     //is the metal bar in the embers?
@@ -22,6 +15,15 @@ public class MetalBarController : MonoBehaviour
     public QuenchingController quenchingController;
     //cooling Constant that is calculated upon instatiation and can be passed to cooling/heating equation parameters
     private float curCoolingConst;
+    private static float gradientTempToTime(float metalTemp){
+        return ((metalTemp - 550.0f)/750.0f);
+    }
+    private GradientColorKey[] incanColorKeys = {new GradientColorKey(new Color(0.12743768f, 0.0f, 0.0f, 1.00f), 0.0f), 
+    new GradientColorKey(new Color(0.30946895f, 0.0f, 0.0f, 1.00f),gradientTempToTime(680.0f)),new GradientColorKey(new Color(0.61720675f, 0.0f, 0.0f, 1.0f),gradientTempToTime(770.0f)),
+    new GradientColorKey(new Color(0.8631574f, 0.0f, 0.0f, 1.00f),gradientTempToTime(850.0f)),new GradientColorKey(new Color(1.0f, 0.32314324f, 0.03071345f, 1.0f), gradientTempToTime(950.0f)),
+    new GradientColorKey(new Color(1.0f, 0.5840786f, 0.0f, 1.0f), gradientTempToTime(1000.0f)),
+    new GradientColorKey(new Color(1.0f, 1.0f, 0.03071345f, 1.0f), gradientTempToTime(1100.0f)),new GradientColorKey(new Color(1.0f, 1.0f, 1.0f, 1.0f), gradientTempToTime(1300.0f))};
+    private GradientAlphaKey[] incanAlphaKeys = new GradientAlphaKey[8];
     public Material mBMaterial;
     //when object is not being heated or cooled
     public void resetTimer(){
@@ -29,8 +31,9 @@ public class MetalBarController : MonoBehaviour
     }
     // Start is called before the first frame update
     void Start(){
+        incanGradient = new Gradient();
         //GameStats.ambientTemp = 27.0f;
-        resetTimer();
+        //resetTimer();
         GameStats.ambientTemp = 22.0f;
         metalBarStruct.metalTemp = GameStats.ambientTemp;
         isHeating = false;
@@ -40,8 +43,12 @@ public class MetalBarController : MonoBehaviour
         curCoolingConst = (metalBarStruct.thermConduct*metalBarStruct.surfaceArea)*(metalBarRB.mass*metalBarStruct.specificHeat*metalBarStruct.normalDepth);
         mBMaterial.DisableKeyword("_EMISSION");
         isEmitting = false;
+        for(int i = 0;i < 8;i++){
+            incanAlphaKeys[i].alpha = 1.00f;
+            incanAlphaKeys[i].time = incanColorKeys[i].time;
+        }
+        incanGradient.SetKeys(incanColorKeys, incanAlphaKeys);
     }
-
     void FixedUpdate(){
         time += Time.deltaTime;
         inAir = (!isHeating && !inWater);
@@ -54,33 +61,7 @@ public class MetalBarController : MonoBehaviour
             }
         if(isEmitting){
             mBMaterial.EnableKeyword("_EMISSION");
-            if(metalBarStruct.metalTemp >= 550.0f && metalBarStruct.metalTemp < 630.0f)
-                desiredColor = emissiveColors[0];
-            else if(metalBarStruct.metalTemp >= 630.0f && metalBarStruct.metalTemp < 680.0f)
-                desiredColor = emissiveColors[1];
-            else if(metalBarStruct.metalTemp >= 680.0f && metalBarStruct.metalTemp < 740.0f)
-                desiredColor = emissiveColors[2];
-            else if(metalBarStruct.metalTemp >= 740.0f && metalBarStruct.metalTemp < 770.0f)
-                desiredColor = emissiveColors[3];
-            else if(metalBarStruct.metalTemp >= 770.0f && metalBarStruct.metalTemp < 800.0f)
-                desiredColor = emissiveColors[4];
-            else if(metalBarStruct.metalTemp >= 800.0f && metalBarStruct.metalTemp < 850.0f)
-                desiredColor = emissiveColors[5];
-            else if(metalBarStruct.metalTemp >= 850.0f && metalBarStruct.metalTemp < 900.0f)
-                desiredColor = emissiveColors[6];
-            else if(metalBarStruct.metalTemp >= 900.0f && metalBarStruct.metalTemp < 950.0f)
-                desiredColor = emissiveColors[7];
-            else if(metalBarStruct.metalTemp >= 950.0f && metalBarStruct.metalTemp < 1000.0f)
-                desiredColor = emissiveColors[8];
-            else if(metalBarStruct.metalTemp >= 1000.0f && metalBarStruct.metalTemp < 1100.0f)
-                desiredColor = emissiveColors[9];
-            else if(metalBarStruct.metalTemp >= 1100.0f && metalBarStruct.metalTemp < 1200.0f)
-                desiredColor = emissiveColors[10];
-            else if(metalBarStruct.metalTemp >= 1200.0f && metalBarStruct.metalTemp < 1300.0f)
-                desiredColor = emissiveColors[11];
-            else if(metalBarStruct.metalTemp >= 1300.0f)
-                desiredColor = emissiveColors[12];
-            mBMaterial.SetColor("_EmissionColor", desiredColor);
+            mBMaterial.SetColor("_EmissionColor", incanGradient.Evaluate(gradientTempToTime(metalBarStruct.metalTemp)));
         }
         else if(!isEmitting)
             mBMaterial.DisableKeyword("_EMISSION");
@@ -98,7 +79,7 @@ public class MetalBarController : MonoBehaviour
             }
             //Debug.Log(metalBarStruct.metalTemp);
         }
-        else if(!isHeating && metalBarStruct.metalTemp > GameStats.ambientTemp){
+        else if(!isHeating&&metalBarStruct.metalTemp>GameStats.ambientTemp){
             if(!inWater)
                 envTemp = GameStats.ambientTemp;
             if(heatingTimer == 0.0f)
@@ -112,9 +93,7 @@ public class MetalBarController : MonoBehaviour
             }
             //Debug.Log(metalBarStruct.metalTemp);
         }
-        
     }
-
     void  OnCollisionEnter(Collision collision){
        isHeating = collision.collider.tag == "Embers";
        inWater = collision.collider.tag == "Water";
@@ -122,8 +101,6 @@ public class MetalBarController : MonoBehaviour
            envTemp = forgeController.forgeTemp;
        else if(inWater)
             envTemp = quenchingController.getWaterTemp();
-
-
     }
 }
 
