@@ -9,26 +9,37 @@ public class QuenchingController : MonoBehaviour{
     private float waterTemp, initTemp;
     private float waterCoolingConst, timer, quenchingTimer;
     public float  thermalConductivity, surfaceArea, thickness, specificHeat;
-    private MetalBarController mBController;
+    public MetalBarController mBController;
     public MetalInfoController metalInfoContr;
+    public SphereCollider quenchingCollider;
+    public List<GameObject> metalBars = new List<GameObject>();
+    private Transform quenchingMBPos;
     public float getWaterTemp(){
         return waterTemp;
     }
-
     public void resetTimer(){
         quenchingTimer = 0.0f;
     }
-
     // Start is called before the first frame update
     void Start(){
         waterCoolingConst = (thermalConductivity*surfaceArea)/(waterRB.mass*specificHeat*thickness);
         waterTemp = 21.40f;
         resetTimer();
+        isQuenching = false;
     }
     // Update is called once per frame
     void Update(){
         timer += Time.deltaTime;
-        isRoomTemp = (waterTemp == GameStats.ambientTemp);
+        if(!isQuenching){
+            foreach(GameObject metalBar in metalBars){
+                isQuenching = quenchingCollider.bounds.Contains(metalBar.transform.position);
+                if(isQuenching){
+                    mBController = metalBar.GetComponent<MetalBarController>();
+                    quenchingMBPos = metalBar.transform;
+                    return;
+                }
+            }
+        }
         //Water is heated by quenching metal
         if(isQuenching){
             Debug.Log("We are quenching!");
@@ -40,6 +51,10 @@ public class QuenchingController : MonoBehaviour{
                 //call heating law for water, we are cooling a hot object and warming the water
                 waterTemp = NewtonsCoolingEquation.heatObj(mBController.metalBarStruct.metalTemp, initTemp, waterCoolingConst, quenchingTimer, "Water");
                 //Debug.Log(waterTemp);
+            }
+            if(!quenchingCollider.bounds.Contains(quenchingMBPos.position)){
+                resetTimer();
+                isQuenching = false;
             }
         }
         //water is cooling
@@ -65,9 +80,8 @@ public class QuenchingController : MonoBehaviour{
                 waterTemp = NewtonsCoolingEquation.heatObj(GameStats.ambientTemp, initTemp, waterCoolingConst, quenchingTimer, "Water");
                 //Debug.Log(waterTemp);
             }
-        }
-
-        if(Mathf.Round(waterTemp) == GameStats.ambientTemp && !isQuenching && !isRoomTemp){
+        }          
+        if(Mathf.Round(waterTemp) == GameStats.ambientTemp && !isQuenching){
             Debug.Log("The water is now room temp!");
             resetTimer();
             waterTemp  = GameStats.ambientTemp;
@@ -75,13 +89,5 @@ public class QuenchingController : MonoBehaviour{
         //if water is colder than the ambient temp then its gonna have to match it at some point
         metalInfoContr.waterTemp = decimal.Round((decimal)waterTemp,2).ToString();
     }
-    void OnCollisionEnter (Collision coll){
-        //Debug.Log(coll.gameObject.tag);
-        isQuenching = coll.gameObject.tag == "Metal Bars";
-        if(isQuenching)
-            mBController = coll.gameObject.GetComponent<MetalBarController>();
-        else
-            isQuenching = false;
-        resetTimer();
-    }
+
 }

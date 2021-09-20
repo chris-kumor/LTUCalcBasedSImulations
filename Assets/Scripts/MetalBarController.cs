@@ -36,11 +36,9 @@ public class MetalBarController : MonoBehaviour{
         //resetTimer();
         GameStats.ambientTemp = 22.0f;
         metalBarStruct.metalTemp = GameStats.ambientTemp;
-        isHeating = false;
-        inAir = true;
-        inWater = false;
         //(Thermal conductivity * surface area)/(mass * specific heat * thickness)
         curCoolingConst = (metalBarStruct.thermConduct*metalBarStruct.surfaceArea)*(metalBarRB.mass*metalBarStruct.specificHeat*metalBarStruct.normalDepth);
+        //Making sure the metal Obj at a starting temp below emissive temps doesnt suddenly become incandescent
         mBMaterial.DisableKeyword("_EMISSION");
         isEmitting = false;
         for(int i = 0;i < 8;i++){
@@ -48,9 +46,12 @@ public class MetalBarController : MonoBehaviour{
             incanAlphaKeys[i].time = incanColorKeys[i].time;
         }
         incanGradient.SetKeys(incanColorKeys, incanAlphaKeys);
+        quenchingController.metalBars.Add(this.gameObject);
     }
     void FixedUpdate(){
         time += Time.deltaTime;
+        isHeating = forgeController.forgeCollider.bounds.Contains(gameObject.transform.position);
+        inWater = quenchingController.quenchingCollider.bounds.Contains(gameObject.transform.position);
         inAir = (!isHeating && !inWater);
         if(metalBarStruct.metalTemp < 550.0f){
             mBMaterial.DisableKeyword("_EMISSION");
@@ -67,6 +68,7 @@ public class MetalBarController : MonoBehaviour{
             mBMaterial.DisableKeyword("_EMISSION");
         //In the act of heating metal bar
         if(isHeating){
+            envTemp = forgeController.forgeTemp;
             if(heatingTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
             //Debug.Log(initTemp - GameStats.ambientTemp)
@@ -93,14 +95,10 @@ public class MetalBarController : MonoBehaviour{
             }
             //Debug.Log(metalBarStruct.metalTemp);
         }
-    }
-    void  OnCollisionEnter(Collision collision){
-       isHeating = collision.collider.tag == "Embers";
-       inWater = collision.collider.tag == "Water";
-       if(isHeating)
-           envTemp = forgeController.forgeTemp;
-       else if(inWater)
-            envTemp = quenchingController.getWaterTemp();
+        if(inAir){
+            if(heatingTimer != 0.0f)
+                resetTimer();
+        }
     }
 }
 

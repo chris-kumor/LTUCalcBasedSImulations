@@ -23,13 +23,18 @@ public class BlackSmithController : MonoBehaviour{
     public Transform holdingPos;
     //Rigidbody of obj being held
     private Rigidbody objRB;
+    //script attached to the metal bar we are holding
     private MetalBarController mBContr;
+    //reference to the script attacehd to the cooler
     public QuenchingController quenchCont;
+    //bool to tell if we are carrying an obj at the moment
     private bool isCarrying;
+    //This function makes sure that the object we are holding, maintains the same position and rotation relatiev to the position of the blacksmiths tool
     private void holdingObject(){
         holdingObj.transform.position = Vector3.Lerp(holdingObj.transform.position,holdingPos.position,Time.time);
         holdingObj.transform.rotation = Quaternion.Lerp(holdingObj.transform.rotation,holdingPos.rotation,Time.time);
     }
+    //fun the update the users UI so that they are given stats about the metal bar they are looking at and close enough too
     public void updateMetalInfo(){
         metalInfoContr.metalTemp = decimal.Round((decimal)mBContr.metalBarStruct.metalTemp,2).ToString();
         metalInfoContr.metalType = mBContr.metalBarStruct.metalType;
@@ -38,7 +43,7 @@ public class BlackSmithController : MonoBehaviour{
     void Start(){
         interactText.enabled = false;
         isCarrying = false;
-        GameStats.ambientTemp = 22.0f; 
+        GameStats.ambientTemp = 22.0f;
     }
     // Update is called once per frame
     void Update(){
@@ -60,11 +65,8 @@ public class BlackSmithController : MonoBehaviour{
             updateMetalInfo();
             if(Input.GetButtonDown("Interact") && dist <= minDist) {
                 isCarrying = true;
-                mBContr.isHeating = false;
                 if(mBContr.inWater)
                     quenchCont.isQuenching = false;
-                mBContr.inWater = false;
-                mBContr.inAir = true;
                 mBContr.resetTimer();
                 //If we dont ignore the collision between the two objects right the metal bar will prevent us from moving forward 
                 Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, true);
@@ -72,14 +74,13 @@ public class BlackSmithController : MonoBehaviour{
             }
         }
         //dropping
-        else if(isCarrying && Input.GetButtonDown("Interact") && !quenchCont.isQuenching){
+        else if(isCarrying && Input.GetButtonDown("Interact")){
             isCarrying = false;
             objRB.constraints = RigidbodyConstraints.None;
             metalInfoContr.Reset();
             mBContr.resetTimer();
             //Since we are not carrying the metal bar anymore we dont want to just simply phase through it or vice versa5
             Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, false);
-            
         }
         //carrying obj
         else if(isCarrying){   

@@ -5,23 +5,25 @@ using UnityEngine.UI;
 
 public class MetalInfoController : MonoBehaviour
 {
-    public string metalType;
-    public string metalTemp;
-    public string waterTemp;
-    private string defaultStatus = $"Metal Type:\nTemperature:\nAmbient Temperature:{decimal.Round((decimal)GameStats.ambientTemp,2)}C\nWater Temp:";
-    public Text statsText;
-    // Start is called before the first frame update
+    public string metalType,metalTemp,waterTemp;
+    private string envDefault = $"Ambient Temperature:{decimal.Round((decimal)GameStats.ambientTemp,2)}C\nWater Temp:";
+    private string statDefault = $"Metal Type:\nMetal Temperature:\n";
+    public Text EnvStats, ObjStats;
     public void Reset(){
-        statsText.text = defaultStatus;
+        EnvStats.text = envDefault;
+        ObjStats.text = statDefault;
         metalType = null;
         metalTemp = null;
     }
+        // Start is called before the first frame update
     void Start(){
-        statsText.text = defaultStatus;
+        EnvStats.text = envDefault;
+        ObjStats.text = statDefault;
         GameStats.ambientTemp = 22.00f;
     }
     // Update is called once per frame
     void Update(){
-        statsText.text = $"Metal Type:{metalType}\nTemperature:{metalTemp}C\nAmbient Temperature:{decimal.Round((decimal)GameStats.ambientTemp,2)}C\nWater Temp:{waterTemp}C";
+        EnvStats.text = $"Ambient Temperature:{decimal.Round((decimal)GameStats.ambientTemp,2)}C\nWater Temp:{waterTemp}C";
+        ObjStats.text = $"Metal Type:{metalType}\nMetal Temperature:{metalTemp}C\n";
     }
 }
