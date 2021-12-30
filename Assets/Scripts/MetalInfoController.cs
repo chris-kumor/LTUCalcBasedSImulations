@@ -19,7 +19,6 @@ public class MetalInfoController : MonoBehaviour
     void Start(){
         EnvStats.text = envDefault;
         ObjStats.text = statDefault;
-        GameStats.ambientTemp = 22.00f;
     }
     // Update is called once per frame
     void Update(){

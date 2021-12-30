@@ -2,18 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class MetalBarController : MonoBehaviour{
-    private Gradient incanGradient;
-    public MetalStruct metalBarStruct;
-    public Rigidbody metalBarRB;
-    //is the metal bar in the embers?
-    public bool isHeating, inAir, inWater, isEmitting;
-    //"dT/dt"
-    private float instantTempChange, heatingTimer, initTemp, time, envTemp;
-    //Reference to script that contains needed info on the forge such as temperature
-    public ForgeController forgeController;
-    //Reference to script that contains needed info on the forge cooler
-    public QuenchingController quenchingController;
-    //cooling Constant that is calculated upon instatiation and can be passed to cooling/heating equation parameters
+    #region "Private Serialized Fields"
+    [Header("Used to represent incendecent color transition.")]
+    [SerializeField] private Gradient incanGradient;
+    [Tooltip("Data structure w/ nedded attributes for particular instance attached to this script.")]
+    [SerializeField] private MetalStruct metalBarStruct;
+    [SerializeField] private Rigidbody metalBarRB;
+    [Tooltip("Following booleans for evaluating possible states current metal bar instantiation could be in.")]
+    [SerializeField] private bool isHeating, inAir, inWater, isEmitting;
+    [Tooltip("Following floats are used in blocks where metal bar is changing temperature")]
+    [SerializeField] private float heatingTimer, initTemp, envTemp, glowTransitionTimer;
+    [Tooltip("Script attached to forge, to access attributes needed for heating/cooling")]
+    [SerializeField] private ForgeController forgeController;
+    [Tooltip("Script attached to Forge Cooler.")]
+    [SerializeField] private QuenchingController quenchingController;
+    [Tooltip("Material of the metal bars shader, used to change emmisive color to give us incendecent effect.")]
+    [SerializeField] private Material mBMaterial;
+    [Header("Reference to global timer all metal bars reference when heating/cooling over time.")]
+    [SerializeField] private GlobalTimer mGlobalTimer;
+    #endregion
+    #region "Public Fields +  Members"
+    public MetalStruct MetalBarStruct{get{return metalBarStruct;}}
+    public bool InWater{get{return inWater;}set{inWater = value;}}
+    //when object is not being heated or cooled
+    public void resetTimer(){
+        heatingTimer = 0.0f;
+    }
+    #endregion
+    #region "Private Fields + Members"
     private float curCoolingConst;
     private static float gradientTempToTime(float metalTemp){
         return ((metalTemp - 550.0f)/750.0f);
@@ -24,21 +40,12 @@ public class MetalBarController : MonoBehaviour{
     new GradientColorKey(new Color(1.0f, 0.5840786f, 0.0f, 1.0f), gradientTempToTime(1000.0f)),
     new GradientColorKey(new Color(1.0f, 1.0f, 0.03071345f, 1.0f), gradientTempToTime(1100.0f)),new GradientColorKey(new Color(1.0f, 1.0f, 1.0f, 1.0f), gradientTempToTime(1300.0f))};
     private GradientAlphaKey[] incanAlphaKeys = new GradientAlphaKey[8];
-    public Material mBMaterial;
-    //when object is not being heated or cooled
-    public void resetTimer(){
-        heatingTimer = 0.0f;
-    }
+    #endregion
     // Start is called before the first frame update
     void Start(){
-        incanGradient = new Gradient();
-        //GameStats.ambientTemp = 27.0f;
-        //resetTimer();
-        GameStats.ambientTemp = 22.0f;
-        metalBarStruct.metalTemp = GameStats.ambientTemp;
-        //(Thermal conductivity * surface area)/(mass * specific heat * thickness)
-        curCoolingConst = (metalBarStruct.thermConduct*metalBarStruct.surfaceArea)*(metalBarRB.mass*metalBarStruct.specificHeat*metalBarStruct.normalDepth);
         //Making sure the metal Obj at a starting temp below emissive temps doesnt suddenly become incandescent
+        metalBarStruct.metalTemp = GameStats.ambientTemp;
+        incanGradient = new Gradient();
         mBMaterial.DisableKeyword("_EMISSION");
         isEmitting = false;
         for(int i = 0;i < 8;i++){
@@ -46,12 +53,12 @@ public class MetalBarController : MonoBehaviour{
             incanAlphaKeys[i].time = incanColorKeys[i].time;
         }
         incanGradient.SetKeys(incanColorKeys, incanAlphaKeys);
-        quenchingController.metalBars.Add(this.gameObject);
+        //(Thermal conductivity * surface area)/(mass * specific heat * thickness)
+        curCoolingConst = (metalBarStruct.thermConduct*metalBarStruct.surfaceArea)*(metalBarRB.mass*metalBarStruct.specificHeat*metalBarStruct.normalDepth);
     }
     void FixedUpdate(){
-        time += Time.deltaTime;
-        isHeating = forgeController.forgeCollider.bounds.Contains(gameObject.transform.position);
-        inWater = quenchingController.quenchingCollider.bounds.Contains(gameObject.transform.position);
+        isHeating = forgeController.ForgeCollider.bounds.Contains(gameObject.transform.position);
+        inWater = quenchingController.QuenchingCollider.bounds.Contains(gameObject.transform.position);
         inAir = (!isHeating && !inWater);
         if(metalBarStruct.metalTemp < 550.0f){
             mBMaterial.DisableKeyword("_EMISSION");
@@ -62,38 +69,29 @@ public class MetalBarController : MonoBehaviour{
             }
         if(isEmitting){
             mBMaterial.EnableKeyword("_EMISSION");
-            mBMaterial.SetColor("_EmissionColor", incanGradient.Evaluate(gradientTempToTime(metalBarStruct.metalTemp)));
-        }
-        else if(!isEmitting)
-            mBMaterial.DisableKeyword("_EMISSION");
+            mBMaterial.SetColor("_EmissionColor", Color.Lerp(mBMaterial.color,incanGradient.Evaluate(gradientTempToTime(metalBarStruct.metalTemp)), 1.0f));
+        };
         //In the act of heating metal bar
         if(isHeating){
-            envTemp = forgeController.forgeTemp;
             if(heatingTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
-            //Debug.Log(initTemp - GameStats.ambientTemp)
             heatingTimer += Time.deltaTime;
-            if (time >= 1.00f){
-                time = time - 1.00f;
+            if (mGlobalTimer.OneSecPassed){     
                 //Newtons Cooling Law for heating
                 //T(t)= Ambient Temp - (Ambient Temp - Objects init temp) * e^(-k*t)
-                metalBarStruct.metalTemp = NewtonsCoolingEquation.heatObj(envTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);          
+                metalBarStruct.metalTemp = NewtonsCoolingEquation.heatObj(forgeController.ForgeTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);          
             }
-            //Debug.Log(metalBarStruct.metalTemp);
         }
         else if(!isHeating&&metalBarStruct.metalTemp>GameStats.ambientTemp){
-            if(!inWater)
-                envTemp = GameStats.ambientTemp;
+            envTemp = (inWater)?quenchingController.LiquidTemp:GameStats.ambientTemp;
             if(heatingTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
             heatingTimer += Time.deltaTime;
-            if (time >= 1.00f){
-                time = time - 1.00f;
+            if (mGlobalTimer.OneSecPassed){
                 //Newtons Cooling Law
                 //T(t)= Ambient Temp + (Objects init temp - Ambient Temp ) * e^(-k*t)
                  metalBarStruct.metalTemp = NewtonsCoolingEquation.coolObj(envTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);
             }
-            //Debug.Log(metalBarStruct.metalTemp);
         }
         if(inAir){
             if(heatingTimer != 0.0f)

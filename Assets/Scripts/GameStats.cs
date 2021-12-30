@@ -3,5 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameStats : MonoBehaviour{
-public static float ambientTemp;
+public static float ambientTemp = 27.0f;
+
 }

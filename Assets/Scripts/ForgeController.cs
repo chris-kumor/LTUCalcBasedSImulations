@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ForgeController : MonoBehaviour
 {
-    public float forgeTemp;
-    public SphereCollider forgeCollider;
+    [SerializeField] private float forgeTemp;
+    public float ForgeTemp{get{return forgeTemp;}set{forgeTemp = value;}}
+    [SerializeField] private SphereCollider forgeCollider;
+    public SphereCollider ForgeCollider{get{return forgeCollider;}}
 }
