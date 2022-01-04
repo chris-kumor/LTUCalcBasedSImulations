@@ -24,10 +24,7 @@ public class MetalBarController : MonoBehaviour{
     #region "Public Fields +  Members"
     public MetalStruct MetalBarStruct{get{return metalBarStruct;}}
     public bool InWater{get{return inWater;}set{inWater = value;}}
-    //when object is not being heated or cooled
-    public void resetTimer(){
-        heatingTimer = 0.0f;
-    }
+    public float HeatingTimer{get{return heatingTimer;}set{heatingTimer = value;}}
     #endregion
     #region "Private Fields + Members"
     private float curCoolingConst;
@@ -82,7 +79,8 @@ public class MetalBarController : MonoBehaviour{
                 metalBarStruct.metalTemp = NewtonsCoolingEquation.heatObj(forgeController.ForgeTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);          
             }
         }
-        else if(!isHeating&&metalBarStruct.metalTemp>GameStats.ambientTemp){
+        else if((inAir || inWater) && metalBarStruct.metalTemp > GameStats.ambientTemp){
+            Debug.Log($"The metal bar is being cooled is {metalBarStruct.metalTemp} at {heatingTimer}.");
             envTemp = (inWater)?quenchingController.LiquidTemp:GameStats.ambientTemp;
             if(heatingTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
@@ -92,10 +90,6 @@ public class MetalBarController : MonoBehaviour{
                 //T(t)= Ambient Temp + (Objects init temp - Ambient Temp ) * e^(-k*t)
                  metalBarStruct.metalTemp = NewtonsCoolingEquation.coolObj(envTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);
             }
-        }
-        if(inAir){
-            if(heatingTimer != 0.0f)
-                resetTimer();
         }
     }
 }

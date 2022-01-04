@@ -714,18 +714,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1807711010370844830}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &418768827 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5344108314612004985, guid: 1db540cc3a6b9864a822385b09a6d609,
-    type: 3}
-  m_PrefabInstance: {fileID: 5344108315009687490}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a4c75eb113b50049aa039a153f52e7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &431730665 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1807711010621649324, guid: 8e1afaf4ea01b754da3d5ccea9a06ebe,
@@ -1709,6 +1697,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1623947535}
   - component: {fileID: 1623947534}
+  - component: {fileID: 1623947536}
   m_Layer: 2
   m_Name: HeatingColliderGameObject
   m_TagString: Forge
@@ -1743,6 +1732,20 @@ Transform:
   m_Father: {fileID: 152690409}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1623947536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623947533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a4c75eb113b50049aa039a153f52e7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forgeTemp: 1600
+  forgeCollider: {fileID: 1623947534}
 --- !u!54 &1642714751 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 916068378949013913, guid: ddc028f7426bc254dbff88d700bfc0d6,
@@ -2531,7 +2534,7 @@ PrefabInstance:
         type: 3}
       propertyPath: forgeController
       value: 
-      objectReference: {fileID: 418768827}
+      objectReference: {fileID: 1623947536}
     - target: {fileID: 4879420997042719244, guid: ddc028f7426bc254dbff88d700bfc0d6,
         type: 3}
       propertyPath: quenchingController
@@ -3109,7 +3112,8 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5344108314612004985, guid: 1db540cc3a6b9864a822385b09a6d609, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 1db540cc3a6b9864a822385b09a6d609, type: 3}
 --- !u!1001 &7465811733673413851
 PrefabInstance:
@@ -3133,7 +3137,7 @@ PrefabInstance:
     - target: {fileID: 2099307316, guid: aaf29dd4e7c36654f9bce48bb9266bb0, type: 3}
       propertyPath: forgeController
       value: 
-      objectReference: {fileID: 418768827}
+      objectReference: {fileID: 1623947536}
     - target: {fileID: 2099307316, guid: aaf29dd4e7c36654f9bce48bb9266bb0, type: 3}
       propertyPath: quenchingController
       value: 
@@ -3301,7 +3305,7 @@ PrefabInstance:
         type: 3}
       propertyPath: forgeController
       value: 
-      objectReference: {fileID: 418768827}
+      objectReference: {fileID: 1623947536}
     - target: {fileID: 8808998559724628712, guid: 656e9b6b26920984fbcd302b2c7c9760,
         type: 3}
       propertyPath: quenchingController
@@ -3335,7 +3339,7 @@ PrefabInstance:
         type: 3}
       propertyPath: forgeController
       value: 
-      objectReference: {fileID: 418768827}
+      objectReference: {fileID: 1623947536}
     - target: {fileID: 2655633566630141837, guid: 10addd3da29af024e86af39be93e66d9,
         type: 3}
       propertyPath: quenchingController

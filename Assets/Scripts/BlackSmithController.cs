@@ -67,7 +67,6 @@ public class BlackSmithController : MonoBehaviour{
             updateMetalInfo();
             if(Input.GetButtonDown("Interact") && dist <= minDist) {
                 isCarrying = true;
-                mBContr.resetTimer();
                 holdingObject();
                 //If we dont ignore the collision between the two objects right the metal bar will prevent us from moving forward 
                 Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, true);
@@ -79,7 +78,6 @@ public class BlackSmithController : MonoBehaviour{
             holdingObj.transform.SetParent(null);
             objRB.constraints = RigidbodyConstraints.None;
             metalInfoContr.Reset();
-            mBContr.resetTimer();
             Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, false);
         }
         //carrying obj

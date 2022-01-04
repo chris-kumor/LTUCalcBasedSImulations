@@ -8,4 +8,9 @@ public class ForgeController : MonoBehaviour
     public float ForgeTemp{get{return forgeTemp;}set{forgeTemp = value;}}
     [SerializeField] private SphereCollider forgeCollider;
     public SphereCollider ForgeCollider{get{return forgeCollider;}}
+
+    void OnTriggerExit(Collider other){
+        if(other.CompareTag("Metal Bars"))
+            other.GetComponent<MetalBarController>().HeatingTimer = 0.0f;
+    }
 }
