@@ -25,12 +25,23 @@ public class MetalBarController : MonoBehaviour{
     public MetalStruct MetalBarStruct{get{return metalBarStruct;}}
     public bool InWater{get{return inWater;}set{inWater = value;}}
     public float HeatingTimer{get{return heatingTimer;}set{heatingTimer = value;}}
+    public bool IsHeating{get{return isHeating;}set{isHeating = value;}}
     #endregion
     #region "Private Fields + Members"
     private float curCoolingConst;
     private static float gradientTempToTime(float metalTemp){
+        //The temp range is within 750.0C to 1300C
+        //Value returned lies between 0-1
         return ((metalTemp - 550.0f)/750.0f);
     }
+    ///<summary>
+    /// This following variable is a Gradient to represent the color scale of incandecence
+    /// The values represent the color shift experienced by metals when being heated.
+    /// The current temperature of the metal bar is passed into a local func.
+    /// The local func then returns a val that lies between 0 -1
+    /// 0 = Temperature is less then min temp for incandecence
+    /// 1 = Maximum Temperature such that any temperature higher does not change the color of icandecence
+    ///</summary>
     private GradientColorKey[] incanColorKeys = {new GradientColorKey(new Color(0.12743768f, 0.0f, 0.0f, 1.00f), 0.0f), 
     new GradientColorKey(new Color(0.30946895f, 0.0f, 0.0f, 1.00f),gradientTempToTime(680.0f)),new GradientColorKey(new Color(0.61720675f, 0.0f, 0.0f, 1.0f),gradientTempToTime(770.0f)),
     new GradientColorKey(new Color(0.8631574f, 0.0f, 0.0f, 1.00f),gradientTempToTime(850.0f)),new GradientColorKey(new Color(1.0f, 0.32314324f, 0.03071345f, 1.0f), gradientTempToTime(950.0f)),
@@ -42,6 +53,8 @@ public class MetalBarController : MonoBehaviour{
     void Start(){
         //Making sure the metal Obj at a starting temp below emissive temps doesnt suddenly become incandescent
         metalBarStruct.metalTemp = GameStats.ambientTemp;
+        isHeating = false;
+        inWater = false;
         incanGradient = new Gradient();
         mBMaterial.DisableKeyword("_EMISSION");
         isEmitting = false;
@@ -54,8 +67,6 @@ public class MetalBarController : MonoBehaviour{
         curCoolingConst = (metalBarStruct.thermConduct*metalBarStruct.surfaceArea)*(metalBarRB.mass*metalBarStruct.specificHeat*metalBarStruct.normalDepth);
     }
     void FixedUpdate(){
-        isHeating = forgeController.ForgeCollider.bounds.Contains(gameObject.transform.position);
-        inWater = quenchingController.QuenchingCollider.bounds.Contains(gameObject.transform.position);
         inAir = (!isHeating && !inWater);
         if(metalBarStruct.metalTemp < 550.0f){
             mBMaterial.DisableKeyword("_EMISSION");
@@ -80,7 +91,7 @@ public class MetalBarController : MonoBehaviour{
             }
         }
         else if((inAir || inWater) && metalBarStruct.metalTemp > GameStats.ambientTemp){
-            Debug.Log($"The metal bar is being cooled is {metalBarStruct.metalTemp} at {heatingTimer}.");
+            //Debug.Log($"The metal bar is being cooled is {metalBarStruct.metalTemp} at {heatingTimer}.");
             envTemp = (inWater)?quenchingController.LiquidTemp:GameStats.ambientTemp;
             if(heatingTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;

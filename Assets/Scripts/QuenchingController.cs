@@ -22,17 +22,19 @@ public class QuenchingController : MonoBehaviour{
     public bool IsQuenching{get{return isQuenching;}set{isQuenching=value;}}
     public float LiquidTemp{get{return liquidTemp;}set{liquidTemp=value;}}
     public SphereCollider QuenchingCollider{get{return quenchingCollider;}}
-
     #endregion
 
     //public List<GameObject> metalBars = new List<GameObject>();
     private Transform quenchingMBPos;
      public void resetTimer(){
         quenchingTimer = 0.0f;
+        if(mBController != null)
+            mBController.HeatingTimer = 0.0f;
     }
     public bool gatherMBInfo(Collider other){
         mBController = other.gameObject.GetComponent<MetalBarController>();
         quenchingMBPos = other.transform;
+        mBController.InWater = true;
         return true;
     }
     // Start is called before the first frame update
@@ -98,9 +100,11 @@ public class QuenchingController : MonoBehaviour{
     void OnTriggerEnter(Collider other){
         Debug.Log($"{other.name} is being submerged.");
         isQuenching = other.CompareTag("Metal Bars")?gatherMBInfo(other):false;
+        resetTimer();
     }
     void OnTriggerExit(){
         resetTimer();
+        mBController.InWater = false;
         mBController = null;
         quenchingMBPos = null;
         isQuenching = false;

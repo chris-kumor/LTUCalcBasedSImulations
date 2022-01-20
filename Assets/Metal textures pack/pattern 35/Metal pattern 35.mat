@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Metal pattern 35
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _NORMALMAP
+  m_ShaderKeywords: _EMISSION _NORMALMAP
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -75,6 +75,6 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0.12748939, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0.97679985, g: 0.26835793, b: 0.02550633, a: 1}
     - _SpecColor: {r: 0.90588236, g: 0.90588236, b: 0.90588236, a: 1}
   m_BuildTextureStacks: []
