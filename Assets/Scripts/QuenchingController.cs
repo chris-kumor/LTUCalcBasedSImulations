@@ -29,7 +29,7 @@ public class QuenchingController : MonoBehaviour{
      public void resetTimer(){
         quenchingTimer = 0.0f;
         if(mBController != null)
-            mBController.HeatingTimer = 0.0f;
+            mBController.ThermalTimer = 0.0f;
     }
     public bool gatherMBInfo(Collider other){
         mBController = other.gameObject.GetComponent<MetalBarController>();

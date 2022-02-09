@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class MetalBarController : MonoBehaviour{
@@ -11,7 +11,7 @@ public class MetalBarController : MonoBehaviour{
     [Tooltip("Following booleans for evaluating possible states current metal bar instantiation could be in.")]
     [SerializeField] private bool isHeating, inAir, inWater, isEmitting;
     [Tooltip("Following floats are used in blocks where metal bar is changing temperature")]
-    [SerializeField] private float heatingTimer, initTemp, envTemp, glowTransitionTimer;
+    [SerializeField] private float thermalTimer, initTemp, envTemp, glowTransitionTimer;
     [Tooltip("Script attached to forge, to access attributes needed for heating/cooling")]
     [SerializeField] private ForgeController forgeController;
     [Tooltip("Script attached to Forge Cooler.")]
@@ -24,7 +24,7 @@ public class MetalBarController : MonoBehaviour{
     #region "Public Fields +  Members"
     public MetalStruct MetalBarStruct{get{return metalBarStruct;}}
     public bool InWater{get{return inWater;}set{inWater = value;}}
-    public float HeatingTimer{get{return heatingTimer;}set{heatingTimer = value;}}
+    public float ThermalTimer{get{return thermalTimer;}set{thermalTimer = value;}}
     public bool IsHeating{get{return isHeating;}set{isHeating = value;}}
     #endregion
     #region "Private Fields + Members"
@@ -81,25 +81,25 @@ public class MetalBarController : MonoBehaviour{
         };
         //In the act of heating metal bar
         if(isHeating){
-            if(heatingTimer == 0.0f)
+            if(thermalTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
-            heatingTimer += Time.deltaTime;
+            thermalTimer += Time.deltaTime;
             if (mGlobalTimer.OneSecPassed){     
                 //Newtons Cooling Law for heating
                 //T(t)= Ambient Temp - (Ambient Temp - Objects init temp) * e^(-k*t)
-                metalBarStruct.metalTemp = NewtonsCoolingEquation.heatObj(forgeController.ForgeTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);          
+                metalBarStruct.metalTemp = NewtonsCoolingEquation.heatObj(forgeController.ForgeTemp, initTemp, curCoolingConst, thermalTimer, metalBarStruct.metalType);          
             }
         }
         else if((inAir || inWater) && metalBarStruct.metalTemp > GameStats.ambientTemp){
             //Debug.Log($"The metal bar is being cooled is {metalBarStruct.metalTemp} at {heatingTimer}.");
             envTemp = (inWater)?quenchingController.LiquidTemp:GameStats.ambientTemp;
-            if(heatingTimer == 0.0f)
+            if(thermalTimer == 0.0f)
                 initTemp = metalBarStruct.metalTemp;
-            heatingTimer += Time.deltaTime;
+            thermalTimer += Time.deltaTime;
             if (mGlobalTimer.OneSecPassed){
                 //Newtons Cooling Law
                 //T(t)= Ambient Temp + (Objects init temp - Ambient Temp ) * e^(-k*t)
-                 metalBarStruct.metalTemp = NewtonsCoolingEquation.coolObj(envTemp, initTemp, curCoolingConst, heatingTimer, metalBarStruct.metalType);
+                 metalBarStruct.metalTemp = NewtonsCoolingEquation.coolObj(envTemp, initTemp, curCoolingConst, thermalTimer, metalBarStruct.metalType);
             }
         }
     }

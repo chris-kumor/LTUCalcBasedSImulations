@@ -12,7 +12,7 @@ public class ForgeController : MonoBehaviour
 
     void OnTriggerExit(Collider other){
         if(other.CompareTag("Metal Bars")){
-            otherMB.HeatingTimer = 0.0f;
+            otherMB.ThermalTimer = 0.0f;
             otherMB.IsHeating = false;
             otherMB = null;
         }
@@ -21,7 +21,7 @@ public class ForgeController : MonoBehaviour
     void OnTriggerEnter(Collider other){
         if(other.CompareTag("Metal Bars")){
             otherMB = other.GetComponent<MetalBarController>();
-            otherMB.HeatingTimer = 0.0f;
+            otherMB.ThermalTimer = 0.0f;
             otherMB.IsHeating = true;
             
         }

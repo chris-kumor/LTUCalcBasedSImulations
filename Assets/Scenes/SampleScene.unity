@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.2158925, b: 0.29782635, a: 1}
+  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1746,6 +1746,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   forgeTemp: 1600
   forgeCollider: {fileID: 1623947534}
+  otherMB: {fileID: 0}
 --- !u!54 &1642714751 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 916068378949013913, guid: ddc028f7426bc254dbff88d700bfc0d6,
@@ -2288,10 +2289,12 @@ MonoBehaviour:
   playerCam: {fileID: 20437471066884924}
   tool: {fileID: 320932300}
   holdingObj: {fileID: 0}
+  objInLOS: {fileID: 0}
+  minDist: 1
   interactText: {fileID: 1963876539}
   metalInfoContr: {fileID: 1665039989}
-  minDist: 1
   holdingPos: {fileID: 1951695897}
+  quenchCont: {fileID: 0}
 --- !u!4 &4490258933973614 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 710140823359369100, guid: 271529b91cdae464f8cf8a958124b4a5,
@@ -2574,6 +2577,16 @@ PrefabInstance:
       propertyPath: jumpStrength
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 654442923161342690, guid: 271529b91cdae464f8cf8a958124b4a5,
+        type: 3}
+      propertyPath: m_Mass
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 692856464509740766, guid: 271529b91cdae464f8cf8a958124b4a5,
+        type: 3}
+      propertyPath: field of view
+      value: 70
+      objectReference: {fileID: 0}
     - target: {fileID: 707193986447826270, guid: 271529b91cdae464f8cf8a958124b4a5,
         type: 3}
       propertyPath: m_Layer
@@ -2622,7 +2635,7 @@ PrefabInstance:
     - target: {fileID: 708506107575936050, guid: 271529b91cdae464f8cf8a958124b4a5,
         type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 708506108741988061, guid: 271529b91cdae464f8cf8a958124b4a5,
         type: 3}
@@ -2722,7 +2735,7 @@ PrefabInstance:
     - target: {fileID: 710420918229731436, guid: 271529b91cdae464f8cf8a958124b4a5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.1
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 710420918229731436, guid: 271529b91cdae464f8cf8a958124b4a5,
         type: 3}
@@ -3110,6 +3123,11 @@ PrefabInstance:
     - target: {fileID: 5344108315089229890, guid: 1db540cc3a6b9864a822385b09a6d609,
         type: 3}
       propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5344108315089229890, guid: 1db540cc3a6b9864a822385b09a6d609,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
