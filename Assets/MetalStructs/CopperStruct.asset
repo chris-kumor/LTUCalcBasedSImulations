@@ -18,3 +18,4 @@ MonoBehaviour:
   surfaceArea: 0.1
   normalDepth: 0.1
   thermConduct: 0.4
+  youngsModulus: 117

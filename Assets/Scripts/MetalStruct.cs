@@ -10,6 +10,7 @@ public class MetalStruct : ScriptableObject{
     public float surfaceArea;
     public float normalDepth;
     public float thermConduct;
+    public float youngsModulus;
 
 
 }

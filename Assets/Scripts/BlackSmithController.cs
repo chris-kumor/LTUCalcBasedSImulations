@@ -31,9 +31,9 @@ public class BlackSmithController : MonoBehaviour{
     private bool isCarrying;
     //This function makes sure that the object we are holding, maintains the same position and rotation relatiev to the position of the blacksmiths tool
     private void holdingObject(){
+        holdingObj.transform.SetParent(gameObject.transform.Find("First Person Camera/blacksmithTongs"), false);
         holdingObj.transform.position = Vector3.Lerp(holdingObj.transform.position,holdingPos.position,Time.time);
         holdingObj.transform.rotation = Quaternion.Lerp(holdingObj.transform.rotation,holdingPos.rotation,Time.time);
-        holdingObj.transform.SetParent(gameObject.transform.Find("First Person Camera/blacksmithTongs"));
         Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, true);
         objRB.constraints = RigidbodyConstraints.FreezeAll;
     }
@@ -81,7 +81,9 @@ public class BlackSmithController : MonoBehaviour{
             metalInfoContr.Reset();
             mBContr.ThermalTimer = 0.0f;
             Physics.IgnoreLayerCollision(gameObject.layer, holdingObj.layer, false);
-            holdingObj.transform.parent = null;
+            Vector3 ogScale = holdingObj.transform.localScale;
+            holdingObj.transform.SetParent(null, true);
+            holdingObj.transform.localScale = ogScale;
 
         }
         //carrying obj

@@ -83,7 +83,7 @@ public class QuenchingController : MonoBehaviour{
             }
         }          
         if(Mathf.Round(liquidTemp) == GameStats.ambientTemp && !isQuenching){
-            Debug.Log("The water is now room temp!");
+            //Debug.Log("The water is now room temp!");
             resetTimer();
             liquidTemp  = GameStats.ambientTemp;
         }
@@ -98,7 +98,7 @@ public class QuenchingController : MonoBehaviour{
     }
 
     void OnTriggerEnter(Collider other){
-        Debug.Log($"{other.name} is being submerged.");
+        //Debug.Log($"{other.name} is being submerged.");
         isQuenching = other.CompareTag("Metal Bars")?gatherMBInfo(other):false;
         resetTimer();
     }
